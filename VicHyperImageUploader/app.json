@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "VicHyperImageUploader",
-    "slug": "VicHyperImageUploader",
+    "name": "VicHyperImageDAQ",
+    "slug": "vichyperimagedaq",
     "platforms": [
       "ios",
       "android",
