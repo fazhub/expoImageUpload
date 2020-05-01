@@ -1,18 +1,18 @@
 import * as React from 'react';
-import { Button, Image, View, Alert, Text } from 'react-native';
+import { Button, Image, View, Alert, Text, Picker, TextInput } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
 import * as firebase from 'firebase';
 
 const config = {
-    apiKey: "AIzaSyAGkmZQ8kNRteFCWlRYIbXFfv_DPDtAOVw",
-    authDomain: "uploadimages-9e431.firebaseapp.com",
-    databaseURL: "https://uploadimages-9e431.firebaseio.com",
-    projectId: "uploadimages-9e431",
-    storageBucket: "uploadimages-9e431.appspot.com",
-    messagingSenderId: "580148386923",
-    appId: "1:580148386923:web:d3ccbd005ebe250deb652e"
+  apiKey: "AIzaSyBM6gqCO9M2DJbnVKX2pgKR9g8NRJGRTnE",
+  authDomain: "vichyperimagestore.firebaseapp.com",
+  databaseURL: "https://vichyperimagestore.firebaseio.com",
+  projectId: "vichyperimagestore",
+  storageBucket: "vichyperimagestore.appspot.com",
+  messagingSenderId: "742336376482",
+  appId: "1:742336376482:web:6a93d1310a629d1b91f1fb"
 }
 
 if (!firebase.apps.length) firebase.initializeApp(config);
@@ -20,19 +20,44 @@ if (!firebase.apps.length) firebase.initializeApp(config);
 export default class ImagePickerExample extends React.Component {
   state = {
     image: null,
+    text: 'enter name here              ',
+    material: 'Other'
   };
+   
 
   onChooseImagePress = async () => {
+
+    Alert.alert(this.state.material);
     //firebase.initializeApp(ApiKeys.FirebaseConfig);
+
+
     
     // let result = await ImagePicker.launchCameraAsync();
     //Alert.alert("launchCameraAsync");
     let result = await ImagePicker.launchImageLibraryAsync();
 
     if (!result.cancelled) {
-      this.uploadImage(result.uri, 'test-image')
+      this.uploadImage(result.uri, this.state.text)
         .then(() => {
-          Alert.alert('Success');
+          Alert.alert("Sucess");
+        })
+        .catch(error => {
+          Alert.alert(error);
+        });
+    }
+  };
+
+  onCameraPress = async () => {
+    //firebase.initializeApp(ApiKeys.FirebaseConfig);
+    
+    let result = await ImagePicker.launchCameraAsync();
+    //Alert.alert("launchCameraAsync");
+    //let result = await ImagePicker.launchImageLibraryAsync();
+
+    if (!result.cancelled) {
+      this.uploadImage(result.uri, this.state.text)
+        .then(() => {
+          Alert.alert("Sucess");
         })
         .catch(error => {
           Alert.alert(error);
@@ -49,7 +74,7 @@ export default class ImagePickerExample extends React.Component {
     var ref = firebase
       .storage()
       .ref()
-      .child('images/' + imageName);
+      .child(this.state.material + '/' + imageName);
     return ref.put(blob);
   };
 
@@ -59,9 +84,45 @@ export default class ImagePickerExample extends React.Component {
 
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text
+        title="Select material"
+        />
+        <Picker
+          selectedValue={this.state.material}
+          style={{ height: 50, width: 200 }}
+          onValueChange={(itemValue, itemIndex) => this.setState({ material: itemValue })}>
+          <Picker.Item label="Other" value="Other" />
+          <Picker.Item label="Glass" value="Glass" />
+          <Picker.Item label="Plastic" value="Plastic" />
+          <Picker.Item label="Paper" value="Paper" />
+          <Picker.Item label="Waste" value="Waste" />
+        </Picker>
+
+        <Text
+        title="Name Image"
+        />
+
+        <TextInput
+        style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
+        label='ImageName'
+        value={this.state.text}
+        onChangeText={text => this.setState({ text })}
+        />
+
+        <Text
+        title="                   "
+        />
+        <Text
+        title="                   "
+        />
+        <Text
+        title="                   "
+        />
+
+
         <Button
           title="Pick an image from camera roll"
-          onPress={this._pickImage}
+          onPress={this.onChooseImagePress}
         />
         <Text
         title="                   "
@@ -74,8 +135,11 @@ export default class ImagePickerExample extends React.Component {
         />
         <Button
           title="Use Camera"
-          onPress={this._takeImage}
+          onPress={this.onCameraPress}
         />
+        
+
+
         {image && (
           <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
         )}
